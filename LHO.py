@@ -13,7 +13,6 @@ from tqdm import tqdm
 # import matplotlib
 # matplotlib.use('Agg') #changed the backend
 
-
 args = list(map(lambda s: s.lower(), sys.argv))
 coherent_arg = "--coherent" in args
 lho_arg = "--lho" in args
@@ -22,7 +21,7 @@ show_arg = "--show" in args
 
 def Norm(v):
     """Norm for eigenfunction of LHO."""
-    return 1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** v * factorial(v))
+    return 1.0 / np.sqrt(np.sqrt(np.pi) * 2**v * factorial(v))
 
 
 def make_Hr(n_max):
@@ -32,7 +31,9 @@ def make_Hr(n_max):
     # Define the Hermite polynomials up to order n_max by recursion:
     # H_[v] = 2qH_[v-1] - 2(v-1)H_[v-2]
     Hr = [None] * (n_max + 1)
-    Hr[0] = np.poly1d([1.0,])
+    Hr[0] = np.poly1d([
+        1.0,
+    ])
     Hr[1] = np.poly1d([2.0, 0.0])
     for v in range(2, n_max + 1):
         Hr[v] = Hr[1] * Hr[v - 1] - 2 * (v - 1) * Hr[v - 2]
@@ -50,7 +51,8 @@ def get_psi(q, C):
     Hr_l = make_Hr(len(C))
     amp = 0
     for n in range(len(C)):
-        amp += C[n] * 1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** n * factorial(n)) * Hr_l[n](q)
+        amp += C[n] * 1.0 / np.sqrt(
+            np.sqrt(np.pi) * 2**n * factorial(n)) * Hr_l[n](q)
     amp *= np.exp(-q * q / 2.0)
     return amp
 
@@ -62,9 +64,9 @@ def store_eigenfunctions(q_lin, n_max):
     for q_i in range(q_lin.shape[0]):
         for n in range(n_max):
             q = q_lin[q_i]
-            eig_fun[q_i, n] = (
-                1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** n * factorial(n)) * Hr_l[n](q)
-            )
+            eig_fun[q_i, n] = (1.0 /
+                               np.sqrt(np.sqrt(np.pi) * 2**n * factorial(n)) *
+                               Hr_l[n](q))
     return eig_fun
 
 
@@ -79,12 +81,8 @@ def psi_from_stored(q_lin, q_i, C, eig_fun):
 
 
 def gaussian(x, mu, sig, A):
-    return (
-        A
-        * 1.0
-        / (np.sqrt(2.0 * np.pi) * sig)
-        * np.exp(-np.power((x - mu) / sig, 2.0) / 2)
-    )
+    return (A * 1.0 / (np.sqrt(2.0 * np.pi) * sig) * np.exp(-np.power(
+        (x - mu) / sig, 2.0) / 2))
 
 
 def rk4(f, t0, t1, y0, n, args):
@@ -118,16 +116,16 @@ creation_op = np.zeros((N, N), dtype="float64")
 for i in range(N):
     for j in range(N):
         if i + 1 == j:
-            annihilation_op[i, j] = (i + 1) ** 0.5
+            annihilation_op[i, j] = (i + 1)**0.5
         if i == j + 1:
-            creation_op[i, j] = (j + 1) ** 0.5
+            creation_op[i, j] = (j + 1)**0.5
 
 omega = 1
 
-x_op = (1 / 2.0 / omega) ** 0.5 * (creation_op + annihilation_op)
-p_op = 1j * (omega / 2.0) ** 0.5 * (creation_op - annihilation_op)
+x_op = (1 / 2.0 / omega)**0.5 * (creation_op + annihilation_op)
+p_op = 1j * (omega / 2.0)**0.5 * (creation_op - annihilation_op)
 
-H_LHO = 0.5 * np.dot(p_op, p_op) + 0.5 * omega ** 2 * np.dot(x_op, x_op)
+H_LHO = 0.5 * np.dot(p_op, p_op) + 0.5 * omega**2 * np.dot(x_op, x_op)
 
 # Setting animation writer
 Writer = animation.writers["ffmpeg"]
@@ -147,11 +145,8 @@ if coherent_arg:
     # Obtaining initial coefficients for coherent state
     C = np.zeros((N), dtype="complex128")
     for n in range(C.shape[0]):
-        C[n] = (
-            np.exp(-np.absolute(alpha) ** 2 / 2)
-            * np.power(alpha, n)
-            / math.sqrt(factorial(n))
-        )
+        C[n] = (np.exp(-np.absolute(alpha)**2 / 2) * np.power(alpha, n) /
+                math.sqrt(factorial(n)))
 
     # Setting initial wavefunction
     psi_0 = np.zeros((N), dtype="complex128")
@@ -160,7 +155,7 @@ if coherent_arg:
     psi_t = np.zeros((t_count + 1, N), dtype="complex128")
 
     # Running dynamics
-    t_lin, psi_t = rk4(dynamics, 0, t_max, psi_0, t_count, args=(H_LHO,))
+    t_lin, psi_t = rk4(dynamics, 0, t_max, psi_0, t_count, args=(H_LHO, ))
 
     fig, axes = plt.subplots(nrows=1)
 
@@ -182,20 +177,19 @@ if coherent_arg:
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
             x = x_lin[x_i]
-            y_lin[t_i, x_i] = (
-                np.absolute(
-                    psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-                    + 1j * psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
-                )
-                ** 2
-            )
+            y_lin[t_i, x_i] = (np.absolute(
+                psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun) +
+                1j *
+                psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun))**2)
 
     lines = [plot(axes, "r-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(
-        fig, animate, range(0, t_count), interval=30, blit=True
-    )
+    ani = animation.FuncAnimation(fig,
+                                  animate,
+                                  range(0, t_count),
+                                  interval=30,
+                                  blit=True)
     if show_arg:
         plt.show()
     else:
@@ -217,19 +211,19 @@ if coherent_arg:
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
             x = x_lin[x_i]
-            y_lin_re[t_i, x_i] = psi_from_stored(
-                x_lin, x_i, np.real(psi_t[t_i]), eig_fun
-            )
-            y_lin_im[t_i, x_i] = psi_from_stored(
-                x_lin, x_i, np.imag(psi_t[t_i]), eig_fun
-            )
+            y_lin_re[t_i, x_i] = psi_from_stored(x_lin, x_i,
+                                                 np.real(psi_t[t_i]), eig_fun)
+            y_lin_im[t_i, x_i] = psi_from_stored(x_lin, x_i,
+                                                 np.imag(psi_t[t_i]), eig_fun)
 
     lines = [plot(axes, "r-"), plot(axes, "b-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(
-        fig, animate, range(0, t_count), interval=30, blit=True
-    )
+    ani = animation.FuncAnimation(fig,
+                                  animate,
+                                  range(0, t_count),
+                                  interval=30,
+                                  blit=True)
     if show_arg:
         plt.show()
     else:
@@ -260,7 +254,8 @@ if lho_arg:
         c = result[0]
         for int_i in range(intervals.shape[0] - 1):
             result = integrate.quad(
-                lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))),
+                lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))
+                           ),
                 intervals[int_i],
                 intervals[int_i + 1],
             )
@@ -278,7 +273,7 @@ if lho_arg:
     for i in range(N):
         psi_0[i] = C[i]
     psi_t = np.zeros((t_count + 1, N), dtype="complex128")
-    t_lin, psi_t = rk4(dynamics, 0, t_max, psi_0, t_count, args=(H_LHO,))
+    t_lin, psi_t = rk4(dynamics, 0, t_max, psi_0, t_count, args=(H_LHO, ))
 
     fig, axes = plt.subplots(nrows=1)
 
@@ -302,20 +297,19 @@ if lho_arg:
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
             x = x_lin[x_i]
-            y_lin[t_i, x_i] = (
-                np.absolute(
-                    psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-                    + 1j * psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
-                )
-                ** 2
-            )
+            y_lin[t_i, x_i] = (np.absolute(
+                psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun) +
+                1j *
+                psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun))**2)
 
     lines = [plot(axes, "r-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(
-        fig, animate, range(0, t_count), interval=30, blit=True
-    )
+    ani = animation.FuncAnimation(fig,
+                                  animate,
+                                  range(0, t_count),
+                                  interval=30,
+                                  blit=True)
     if show_arg:
         plt.show()
     else:
@@ -339,19 +333,19 @@ if lho_arg:
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
             x = x_lin[x_i]
-            y_lin_re[t_i, x_i] = psi_from_stored(
-                x_lin, x_i, np.real(psi_t[t_i]), eig_fun
-            )
-            y_lin_im[t_i, x_i] = psi_from_stored(
-                x_lin, x_i, np.imag(psi_t[t_i]), eig_fun
-            )
+            y_lin_re[t_i, x_i] = psi_from_stored(x_lin, x_i,
+                                                 np.real(psi_t[t_i]), eig_fun)
+            y_lin_im[t_i, x_i] = psi_from_stored(x_lin, x_i,
+                                                 np.imag(psi_t[t_i]), eig_fun)
 
     lines = [plot(axes, "r-"), plot(axes, "b-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(
-        fig, animate, range(0, t_count), interval=30, blit=True
-    )
+    ani = animation.FuncAnimation(fig,
+                                  animate,
+                                  range(0, t_count),
+                                  interval=30,
+                                  blit=True)
     if show_arg:
         plt.show()
     else:
