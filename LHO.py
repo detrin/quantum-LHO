@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import math
-import pickle
 import sys
-import scipy
 
 from math import factorial
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as integrate
-from matplotlib import rc
-from scipy.integrate import odeint
 
 from tqdm import tqdm
 
