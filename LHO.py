@@ -34,7 +34,7 @@ def make_Hr(n_max):
     # Define the Hermite polynomials up to order n_max by recursion:
     # H_[v] = 2qH_[v-1] - 2(v-1)H_[v-2]
     Hr = [None] * (n_max + 1)
-    Hr[0] = np.poly1d([1.0, ])
+    Hr[0] = np.poly1d([1.0,])
     Hr[1] = np.poly1d([2.0, 0.0])
     for v in range(2, n_max + 1):
         Hr[v] = Hr[1] * Hr[v - 1] - 2 * (v - 1) * Hr[v - 2]
@@ -52,8 +52,7 @@ def get_psi(q, C):
     Hr_l = make_Hr(len(C))
     amp = 0
     for n in range(len(C)):
-        amp += C[n] * 1.0 / np.sqrt(np.sqrt(np.pi)
-                                    * 2 ** n * factorial(n)) * Hr_l[n](q)
+        amp += C[n] * 1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** n * factorial(n)) * Hr_l[n](q)
     amp *= np.exp(-q * q / 2.0)
     return amp
 
@@ -66,8 +65,7 @@ def store_eigenfunctions(q_lin, n_max):
         for n in range(n_max):
             q = q_lin[q_i]
             eig_fun[q_i, n] = (
-                1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** n *
-                              factorial(n)) * Hr_l[n](q)
+                1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** n * factorial(n)) * Hr_l[n](q)
             )
     return eig_fun
 
@@ -189,8 +187,7 @@ if coherent_arg:
             y_lin[t_i, x_i] = (
                 np.absolute(
                     psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-                    + 1j * psi_from_stored(x_lin, x_i,
-                                           np.imag(psi_t[t_i]), eig_fun)
+                    + 1j * psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
                 )
                 ** 2
             )
@@ -250,7 +247,10 @@ if lho_arg:
     print("obtaining fourier coefficients ... ")
     Amp = 1
     psi_0 = np.zeros((N), dtype="complex128")
-    def wave_gauss(q): return gaussian(q, -1, 1, Amp)
+
+    def wave_gauss(q):
+        return gaussian(q, -1, 1, Amp)
+
     intervals = np.linspace(-10, 10, 10)
     C = []
     for n in tqdm(range(N)):
@@ -262,8 +262,7 @@ if lho_arg:
         c = result[0]
         for int_i in range(intervals.shape[0] - 1):
             result = integrate.quad(
-                lambda q: (get_psi_part(n, q) *
-                           (wave_gauss(q) - get_psi(q, C))),
+                lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))),
                 intervals[int_i],
                 intervals[int_i + 1],
             )
@@ -308,8 +307,7 @@ if lho_arg:
             y_lin[t_i, x_i] = (
                 np.absolute(
                     psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-                    + 1j * psi_from_stored(x_lin, x_i,
-                                           np.imag(psi_t[t_i]), eig_fun)
+                    + 1j * psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
                 )
                 ** 2
             )
