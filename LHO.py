@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-
 import math
 import sys
-
 from math import factorial
+
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as integrate
-
 from tqdm import tqdm
 
 # In case you want to plot without using X server.
