@@ -31,6 +31,7 @@ def Norm(v):
     """Norm for eigenfunction of LHO."""
     return 1.0 / np.sqrt(np.sqrt(np.pi) * 2 ** v * factorial(v))
 
+
 def make_Hr(n_max):
     """Return a list of np.poly1d objects representing Hermite polynomials."""
     if n_max == 0:
@@ -148,12 +149,16 @@ if coherent_arg:
 
     # Choose alpha
     alp_size, alp_phase = 2, 0
-    alpha = np.absolute(alp_size)*np.exp(1j*alp_phase)
+    alpha = np.absolute(alp_size) * np.exp(1j * alp_phase)
 
     # Obtaining initial coefficients for coherent state
     C = np.zeros((N), dtype="complex128")
     for n in range(C.shape[0]):
-        C[n] = np.exp(-np.absolute(alpha)**2/2)*np.power(alpha, n)/math.sqrt(factorial(n))
+        C[n] = (
+            np.exp(-np.absolute(alpha) ** 2 / 2)
+            * np.power(alpha, n)
+            / math.sqrt(factorial(n))
+        )
 
     # Setting initial wavefunction
     psi_0 = np.zeros((N), dtype="complex128")
@@ -177,11 +182,9 @@ if coherent_arg:
     def plot(ax, style):
         return ax.plot(x_lin, y_lin[0], style, animated=True)[0]
 
-
     def animate(t_i):
         lines[0].set_ydata(y_lin[t_i])
         return lines
-
 
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
@@ -189,7 +192,7 @@ if coherent_arg:
             y_lin[t_i, x_i] = (
                 np.absolute(
                     psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-                    + 1j*psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
+                    + 1j * psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
                 )
                 ** 2
             )
@@ -197,11 +200,13 @@ if coherent_arg:
     lines = [plot(axes, "r-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(fig, animate, range(0, t_count), interval=30, blit=True)
+    ani = animation.FuncAnimation(
+        fig, animate, range(0, t_count), interval=30, blit=True
+    )
     if show_arg:
         plt.show()
     else:
-        ani.save('coherent_p.mp4', writer=writer)
+        ani.save("coherent_p.mp4", writer=writer)
 
     fig, axes = plt.subplots(nrows=1)
 
@@ -219,17 +224,23 @@ if coherent_arg:
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
             x = x_lin[x_i]
-            y_lin_re[t_i, x_i] = psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-            y_lin_im[t_i, x_i] = psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
+            y_lin_re[t_i, x_i] = psi_from_stored(
+                x_lin, x_i, np.real(psi_t[t_i]), eig_fun
+            )
+            y_lin_im[t_i, x_i] = psi_from_stored(
+                x_lin, x_i, np.imag(psi_t[t_i]), eig_fun
+            )
 
     lines = [plot(axes, "r-"), plot(axes, "b-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(fig, animate, range(0, t_count), interval=30, blit=True)
+    ani = animation.FuncAnimation(
+        fig, animate, range(0, t_count), interval=30, blit=True
+    )
     if show_arg:
         plt.show()
     else:
-        ani.save('coherent_re_im.mp4', writer=writer)
+        ani.save("coherent_re_im.mp4", writer=writer)
 
 ################################################################################
 
@@ -246,16 +257,22 @@ if lho_arg:
     C = []
     for n in tqdm(range(N)):
         result = integrate.quad(
-            lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))), -1000, intervals[0]
+            lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))),
+            -1000,
+            intervals[0],
         )
         c = result[0]
         for int_i in range(intervals.shape[0] - 1):
             result = integrate.quad(
-                lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))), intervals[int_i], intervals[int_i+1]
+                lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))),
+                intervals[int_i],
+                intervals[int_i + 1],
             )
             c += result[0]
         result = integrate.quad(
-            lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))), intervals[-1], 1000
+            lambda q: (get_psi_part(n, q) * (wave_gauss(q) - get_psi(q, C))),
+            intervals[-1],
+            1000,
         )
         c += result[0]
         C.append(c)
@@ -285,7 +302,6 @@ if lho_arg:
         lines[0].set_ydata(y_lin[t_i])
         return lines
 
-
     # Evaluating points in graphs
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
@@ -293,7 +309,7 @@ if lho_arg:
             y_lin[t_i, x_i] = (
                 np.absolute(
                     psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-                    + 1j*psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
+                    + 1j * psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
                 )
                 ** 2
             )
@@ -301,11 +317,13 @@ if lho_arg:
     lines = [plot(axes, "r-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(fig, animate, range(0, t_count), interval=30, blit=True)
+    ani = animation.FuncAnimation(
+        fig, animate, range(0, t_count), interval=30, blit=True
+    )
     if show_arg:
         plt.show()
     else:
-        ani.save('LHO_p.mp4', writer=writer)
+        ani.save("LHO_p.mp4", writer=writer)
 
     ################################################################################
 
@@ -325,14 +343,20 @@ if lho_arg:
     for t_i in tqdm(range(t_count)):
         for x_i in range(x_lin.shape[0]):
             x = x_lin[x_i]
-            y_lin_re[t_i, x_i] = psi_from_stored(x_lin, x_i, np.real(psi_t[t_i]), eig_fun)
-            y_lin_im[t_i, x_i] = psi_from_stored(x_lin, x_i, np.imag(psi_t[t_i]), eig_fun)
+            y_lin_re[t_i, x_i] = psi_from_stored(
+                x_lin, x_i, np.real(psi_t[t_i]), eig_fun
+            )
+            y_lin_im[t_i, x_i] = psi_from_stored(
+                x_lin, x_i, np.imag(psi_t[t_i]), eig_fun
+            )
 
     lines = [plot(axes, "r-"), plot(axes, "b-")]
 
     print("saving animation ... ")
-    ani = animation.FuncAnimation(fig, animate, range(0, t_count), interval=30, blit=True)
+    ani = animation.FuncAnimation(
+        fig, animate, range(0, t_count), interval=30, blit=True
+    )
     if show_arg:
         plt.show()
     else:
-        ani.save('LHO_re_im.mp4', writer=writer)
+        ani.save("LHO_re_im.mp4", writer=writer)
